@@ -42,7 +42,7 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(db_index=True)
+    name = models.CharField(db_index=True, max_length=256)
     year = models.IntegerField(blank=True, validators=[year_validator])
     description = models.TextField
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,

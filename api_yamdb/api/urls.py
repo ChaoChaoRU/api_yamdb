@@ -17,5 +17,5 @@ router_v1.register('users', UsersViewSet, basename='users')
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),
-    path('v1/jwt/', include('api.inner', namespace='api')),
+    path('v1/auth/', include('api.inner', namespace='api')),
 ]
