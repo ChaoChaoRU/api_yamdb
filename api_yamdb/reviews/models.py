@@ -23,7 +23,7 @@ class CustomerUser(AbstractUser):
 
 
 class Genre(models.Model):
-    name = models.CharField
+    name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
     class Meta:
@@ -42,7 +42,7 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(db_index=True)
+    name = models.CharField(db_index=True, max_length=256)
     year = models.IntegerField(blank=True, validators=[year_validator])
     description = models.TextField
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
