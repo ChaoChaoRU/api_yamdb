@@ -1,26 +1,58 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from .validators import year_validator
 
+user = get_user_model()
+moderator = get_user_model()
+admin = get_user_model()
 
-class CustomerUser(AbstractUser):
+
+class CustomUser(AbstractUser):
+    CHOICES = (
+        user,
+        moderator,
+        admin,
+    )
+    username = models.CharField(
+        verbose_name='Имя пользователя',
+        help_text='Введите имя пользователя',
+        unique=True
+    )
     email = models.EmailField(
-        max_length=200,
+        max_length=254,
         verbose_name='Адрес электронной почты',
         help_text='Введите email',
         unique=True
     )
-    role = models.CharField(
-        max_length=200,
-        verbose_name='Статус пользователя',
-        help_text='Введите статус пользователя'
+    first_name = models.CharField(
+        verbose_name='Имя',
+        help_text='Введите имя',
+        blank=True
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        help_text='Введите фамилию',
+        blank=True
     )
     bio = models.TextField(
-        'Биография',
+        verbose_name='Биография',
+        help_text='Напишите кратко о себе',
         blank=True,
     )
+    role = models.CharField(
+        verbose_name='Статус пользователя',
+        help_text='Введите статус пользователя',
+        choices=CHOICES,
+        default=user
+    )
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.username
 
 
 class Genre(models.Model):
@@ -60,7 +92,7 @@ class Review(models.Model):
         verbose_name='Ваш отзыв',
     )
     author = models.ForeignKey(
-        CustomerUser,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор отзыва',
@@ -97,7 +129,7 @@ class Review(models.Model):
 class Comment(models.Model):
     text = models.TextField(verbose_name='Текст комментария')
     author = models.ForeignKey(
-        CustomerUser,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария',
