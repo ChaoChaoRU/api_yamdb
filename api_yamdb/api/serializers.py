@@ -1,9 +1,12 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 
-from reviews.models import Genre, Title, Category
+from reviews.models import CustomUser, Genre, Title, Category
 
-User = get_user_model()
+
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email', )
 
 
 class GenreSerializer(serializers.ModelSerializer):

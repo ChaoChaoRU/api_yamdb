@@ -9,14 +9,13 @@ user = get_user_model()
 moderator = get_user_model()
 admin = get_user_model()
 
-CHOICES = (
-    user,
-    moderator,
-    admin,
-)
-
 
 class CustomUser(AbstractUser):
+    CHOICES = (
+        user,
+        moderator,
+        admin,
+    )
     username = models.CharField(
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
