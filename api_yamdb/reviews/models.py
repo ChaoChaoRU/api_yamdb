@@ -1,11 +1,22 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from .validators import year_validator
 
+user = get_user_model()
+moderator = get_user_model()
+admin = get_user_model()
 
-class CustomerUser(AbstractUser):
+CHOICES = (
+    user,
+    moderator,
+    admin,
+)
+
+
+class CustomUser(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
@@ -34,8 +45,12 @@ class CustomerUser(AbstractUser):
     )
     role = models.CharField(
         verbose_name='Статус пользователя',
-        help_text='Введите статус пользователя'
+        help_text='Введите статус пользователя',
+        choices=CHOICES,
+        default=user
     )
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
@@ -78,7 +93,7 @@ class Review(models.Model):
         verbose_name='Ваш отзыв',
     )
     author = models.ForeignKey(
-        CustomerUser,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор отзыва',
@@ -115,7 +130,7 @@ class Review(models.Model):
 class Comment(models.Model):
     text = models.TextField(verbose_name='Текст комментария')
     author = models.ForeignKey(
-        CustomerUser,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария',
