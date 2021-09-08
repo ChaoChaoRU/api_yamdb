@@ -6,21 +6,39 @@ from .validators import year_validator
 
 
 class CustomerUser(AbstractUser):
+    username = models.CharField(
+        verbose_name='Имя пользователя',
+        help_text='Введите имя пользователя',
+        unique=True
+    )
     email = models.EmailField(
-        max_length=200,
+        max_length=254,
         verbose_name='Адрес электронной почты',
         help_text='Введите email',
         unique=True
     )
+    first_name = models.CharField(
+        verbose_name='Имя',
+        help_text='Введите имя',
+        blank=True
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        help_text='Введите фамилию',
+        blank=True
+    )
+    bio = models.TextField(
+        verbose_name='Биография',
+        help_text='Напишите кратко о себе',
+        blank=True,
+    )
     role = models.CharField(
-        max_length=200,
         verbose_name='Статус пользователя',
         help_text='Введите статус пользователя'
     )
-    bio = models.TextField(
-        'Биография',
-        blank=True,
-    )
+
+    def __str__(self):
+        return self.username
 
 
 class Genre(models.Model):
