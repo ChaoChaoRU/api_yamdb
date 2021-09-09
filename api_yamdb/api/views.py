@@ -24,20 +24,16 @@ from .permissions import SuperUserOrReadOnly
 User = get_user_model()
 
 
-class GetUsersViewSet(LoginRequiredMixin, ListModelMixin):
+class GetUsersViewSet(ListModelMixin):
     queryset = CustomUser.objects.all()
     serializer_class = GetUsersSerializer
     permission_classes = (IsAdminUser,)
     pagination_class = CustomPagination
-    login_url = 'api/v1/auth/token/'
-    redirect_field_name = 'redirect_to'
 
 
-class CreateUserViewSet(LoginRequiredMixin, CreateModelMixin):
+class CreateUserViewSet(CreateModelMixin):
     serializer_class = CreateUserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminUser,)
-    login_url = 'api/v1/auth/token/'
-    redirect_field_name = 'redirect_to'
+    permission_classes = (IsAdminUser,)
 
 
 class GetPatchDeteleUserViewSet(RetrieveModelMixin, UpdateModelMixin,
@@ -47,7 +43,7 @@ class GetPatchDeteleUserViewSet(RetrieveModelMixin, UpdateModelMixin,
 
 class GetPatchDeteleUserView(LoginRequiredMixin, GetPatchDeteleUserViewSet):
     serializer_class = GetPatchDeteleUserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminUser,)
+    permission_classes = (IsAdminUser,)
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', ]
     login_url = 'api/v1/auth/token/'
