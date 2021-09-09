@@ -1,4 +1,3 @@
-from api_yamdb.reviews.models import Category
 from django_filters import rest_framework as rest
 
 from reviews.models import Title
@@ -17,7 +16,7 @@ class TitleFilter(rest.FilterSet):
         field_name='category__slug',
         lookup_expr=['contains'],
     )
-    
+
     class Meta:
         model = Title
         fields = ['name', 'genre', 'category', 'year']
