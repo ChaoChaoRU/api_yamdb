@@ -3,10 +3,25 @@ from rest_framework import serializers
 from reviews.models import CustomUser, Genre, Title, Category
 
 
-class UsersSerializer(serializers.ModelSerializer):
+class GetUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', )
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+
+
+class GetPatchDeteleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
 
 
 class GenreSerializer(serializers.ModelSerializer):
