@@ -17,6 +17,9 @@ from .serializers import GetPatchDeteleUserSerializer
 from .serializers import GenreSerializer, TitleSerializer, CategorySerializer
 from .pagination import CustomPagination
 from reviews.models import CustomUser, Genre, Category, Title
+from reviews.models import Review, Comment
+from .permissions import AuthorOrReadOnly, ModeratorOrReadOnly
+from .permissions import SuperUserOrReadOnly
 
 User = get_user_model()
 
@@ -83,3 +86,20 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+
+    def get_permissions(self):
+        if self.user.is_superuser is True:
+            return (SuperUserOrReadOnly(),)
+        elif self.user.is_staff is False:
+            return (AuthorOrReadOnly(), ModeratorOrReadOnly())
+        else:
+            return (IsAdminUser)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminUser,)
