@@ -1,4 +1,3 @@
-from api_yamdb.reviews.models import CustomerUser
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, mixins, filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,7 +9,8 @@ from .serializers import GenreSerializer, TitleSerializer, CategorySerializer
 
 User = get_user_model()
 
-class CustomViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin
+
+class CustomViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                     mixins.ListModelMixin, viewsets.GenericViewSet):
     pass
 
@@ -23,6 +23,7 @@ class GenreViewSet(CustomViewSet):
     search_fields = ['name', ]
     lookup_field = 'slug'
 
+
 class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializers_class = CategorySerializer
@@ -30,6 +31,7 @@ class CategoryViewSet(CustomViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
