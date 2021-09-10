@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -20,7 +21,9 @@ from reviews.models import Review, Comment
 from .permissions import AuthorOrReadOnly, ModeratorOrReadOnly
 from .permissions import AdminOrReadOnly, SuperUserOrReadOnly
 
-User = get_user_model()
+user = get_user_model()
+moderator = get_user_model()
+admin = get_user_model()
 
 
 class GetUsersViewSet(ListModelMixin, GenericViewSet):
@@ -119,10 +122,14 @@ class GetCreateCommentViewSet(GetCreateViewSet):
 class GetPatchDeleteCommentViewSet(GetPatchDeteleViewSet):
     queryset = Comment.objects.all()
 
-    def get_permissions(self):
+    def get_permissions(self, request):
         if self.user.is_superuser is True:
             return (SuperUserOrReadOnly(),)
-        elif self.user.is_staff is False:
-            return (AuthorOrReadOnly(), ModeratorOrReadOnly())
+        elif request.user.role is admin:
+            return (AdminOrReadOnly(),)
+        elif request.user.role is moderator:
+            return (ModeratorOrReadOnly(),)
+        elif request.user.role is user:
+            return (AuthorOrReadOnly(),)
         else:
-            return (IsAdminUser)
+            return (IsAuthenticatedOrReadOnly,)
