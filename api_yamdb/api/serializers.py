@@ -6,6 +6,7 @@ from reviews.models import CustomUser, Genre, Title, Category
 class GetUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
+        read_only_fields = ('username',)
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
 
@@ -20,6 +21,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 class GetPatchDeteleUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
+        read_only_fields = ('username',)
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
 

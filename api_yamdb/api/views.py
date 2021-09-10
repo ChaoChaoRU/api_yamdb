@@ -8,7 +8,7 @@ from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 
 from .filter import TitleFilter
 from .serializers import GetUsersSerializer, CreateUserSerializer
@@ -32,7 +32,7 @@ class GetUsersViewSet(ListModelMixin, GenericViewSet):
 
 class CreateUserViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = CreateUserSerializer
-    permission_classes = (IsAdminUser,)
+    permission_classes = (AllowAny,)
 
 
 class GetCreateViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
