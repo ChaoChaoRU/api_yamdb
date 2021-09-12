@@ -1,11 +1,12 @@
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import PermissionsMixin 
 from django.db import models
 
 from .validators import year_validator
 
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name']
