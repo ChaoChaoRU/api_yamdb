@@ -7,7 +7,7 @@ from .validators import year_validator
 
 class CustomUser(AbstractBaseUser):
 
-    USERNAME_FIELD = ['username']
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name']
 
     user = 'user'
@@ -20,6 +20,7 @@ class CustomUser(AbstractBaseUser):
         (admin, 'Администратор'),
     )
     username = models.CharField(
+        max_length=256,
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
         unique=True,
@@ -31,11 +32,13 @@ class CustomUser(AbstractBaseUser):
         unique=True
     )
     first_name = models.CharField(
+        max_length=256,
         verbose_name='Имя',
         help_text='Введите имя',
         blank=True,
     )
     last_name = models.CharField(
+        max_length=256,
         verbose_name='Фамилия',
         help_text='Введите фамилию',
         blank=True,
@@ -57,6 +60,7 @@ class CustomUser(AbstractBaseUser):
     # user_permissions = models.BooleanField(default=False)
     # groups
     # is_active
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
