@@ -1,27 +1,30 @@
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from .validators import year_validator
 
 
-class CustomUser(AbstractUser):
-    USER = 'user'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
+class CustomUser(AbstractBaseUser):
 
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['first_name']
+
+    user = 'user'
+    moderator = 'moderator'
+    admin = 'admin'
 
     CHOICES = (
-        (USER, 'Пользователь'),
-        (MODERATOR, 'Модератор'),
-        (ADMIN, 'Администратор')
+        (user, 'Пользователь'),
+        (moderator, 'Модератор'),
+        (admin, 'Администратор'),
     )
     username = models.CharField(
         max_length=256,
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
-        unique=True
+        unique=True,
+        max_length=256
     )
     email = models.EmailField(
         max_length=254,
@@ -33,13 +36,15 @@ class CustomUser(AbstractUser):
         max_length=256,
         verbose_name='Имя',
         help_text='Введите имя',
-        blank=True
+        blank=True,
+        max_length=256
     )
     last_name = models.CharField(
         max_length=256,
         verbose_name='Фамилия',
         help_text='Введите фамилию',
-        blank=True
+        blank=True,
+        max_length=256
     )
     bio = models.TextField(
         verbose_name='Биография',
@@ -51,10 +56,18 @@ class CustomUser(AbstractUser):
         verbose_name='Статус пользователя',
         help_text='Введите статус пользователя',
         choices=CHOICES,
+<<<<<<< HEAD
+        default=user,
+        max_length=256
+=======
         default=USER
+>>>>>>> 11b1ac12f7210423c0812e19f110c0702181da88
     )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    # user_permissions = models.BooleanField(default=False)
+    # groups
+    # is_active
 
     def __str__(self):
         return self.username
