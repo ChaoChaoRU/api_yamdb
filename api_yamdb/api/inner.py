@@ -9,5 +9,5 @@ urlpatterns = [
     path('/', include('djoser.urls')),
     path('/', include('djoser.urls.jwt')),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain'),
-    path('signup/', CreateUserViewSet, basename='signup'),
+    path('signup/', CreateUserViewSet, name='signup'),
 ]

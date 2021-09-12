@@ -5,18 +5,22 @@ from django.db import models
 
 from .validators import year_validator
 
-user = get_user_model()
-moderator = get_user_model()
-admin = get_user_model()
+
 
 
 class CustomUser(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
+
     CHOICES = (
-        user,
-        moderator,
-        admin,
+        (USER, 'Пользователь'),
+        (MODERATOR, 'Модератор'),
+        (ADMIN, 'Администратор')
     )
     username = models.CharField(
+        max_length=256,
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
         unique=True
@@ -28,11 +32,13 @@ class CustomUser(AbstractUser):
         unique=True
     )
     first_name = models.CharField(
+        max_length=256,
         verbose_name='Имя',
         help_text='Введите имя',
         blank=True
     )
     last_name = models.CharField(
+        max_length=256,
         verbose_name='Фамилия',
         help_text='Введите фамилию',
         blank=True
@@ -43,10 +49,11 @@ class CustomUser(AbstractUser):
         blank=True,
     )
     role = models.CharField(
+        max_length=40,
         verbose_name='Статус пользователя',
         help_text='Введите статус пользователя',
         choices=CHOICES,
-        default=user
+        default=USER
     )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)

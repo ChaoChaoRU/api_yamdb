@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import GetUsersViewSet, GetPatchDeteleUserView
 from .views import GenreViewSet, CategoryViewSet
-from .views import GetCreateTitleViewSet, GetPatchDeleteTitleViewSet
+from .views import TitleViewSet
 from .views import GetCreateReviewViewSet, GetPatchDeleteReviewViewSet
 from .views import GetCreateCommentViewSet, GetPatchDeleteCommentViewSet
 
@@ -15,10 +15,7 @@ router_v1.register(
     GetPatchDeteleUserView, basename='user')
 router_v1.register('genres', GenreViewSet, basename='genres')
 router_v1.register('categories', CategoryViewSet, basename='categories')
-router_v1.register('titles', GetCreateTitleViewSet, basename='titles')
-router_v1.register(
-    r'titles/(?P<title_id>\d+)/', GetPatchDeleteTitleViewSet,
-    basename='titles_detail')
+router_v1.register('titles', TitleViewSet, basename='titles')
 router_v1.register(
     r'titles/(?P<title_id>\d+)/review', GetCreateReviewViewSet,
     basename='review')

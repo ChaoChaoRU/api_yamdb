@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from rest_framework import filters
+from rest_framework import filters, viewsets, mixins
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models. import Avg
+from django.db.models import Avg
 from rest_framework.pagination import PageNumberPagination
 from reviews.models import Genre, Category, Title
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
@@ -15,6 +15,8 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from .filter import TitleFilter
 from .serializers import GenreSerializer, TitleReadSerializer
 from .serializers import CategorySerializer, TitleWriteSerializer
+from .serializers import GetUsersSerializer, CreateUserSerializer
+from .serializers import GetPatchDeteleUserSerializer
 from .pagination import CustomPagination
 from reviews.models import CustomUser, Genre, Category, Title
 from reviews.models import Review, Comment
@@ -80,8 +82,7 @@ class CategoryViewSet(CustomViewSet):
 
     
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(
-        rating=Avg('reviews__score')).order_by('-id')
+    queryset = Title.objects.all()
     pagination_class = CustomPagination
     permission_classes = (AdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
