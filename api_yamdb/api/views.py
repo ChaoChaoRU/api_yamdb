@@ -6,7 +6,8 @@ from rest_framework.pagination import PageNumberPagination
 from reviews.models import Genre, Category, Title
 
 from .filter import TitleFilter
-from .serializers import GenreSerializer, TitleReadSerializer, CategorySerializer, TitleWriteSerializer
+from .serializers import GenreSerializer, TitleReadSerializer,
+from .serializers import CategorySerializer, TitleWriteSerializer
 from .pagination import CustomPagination
 from reviews.models import CustomUser, Genre, Category, Title
 from reviews.models import Review, Comment
@@ -14,6 +15,32 @@ from .permissions import AuthorOrReadOnly, ModeratorOrReadOnly
 from .permissions import SuperUserOrReadOnly
 
 User = get_user_model()
+
+
+class GetUsersViewSet(ListModelMixin):
+    queryset = CustomUser.objects.all()
+    serializer_class = GetUsersSerializer
+    permission_classes = (IsAdminUser,)
+    pagination_class = CustomPagination
+
+
+class CreateUserViewSet(CreateModelMixin):
+    serializer_class = CreateUserSerializer
+    permission_classes = (IsAdminUser,)
+
+
+class GetPatchDeteleUserViewSet(RetrieveModelMixin, UpdateModelMixin,
+                                DestroyModelMixin, GenericViewSet):
+    pass
+
+
+class GetPatchDeteleUserView(LoginRequiredMixin, GetPatchDeteleUserViewSet):
+    serializer_class = GetPatchDeteleUserSerializer
+    permission_classes = (IsAdminUser,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username', ]
+    login_url = 'api/v1/auth/token/'
+    redirect_field_name = 'redirect_to'
 
 
 class CustomViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
