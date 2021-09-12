@@ -4,15 +4,15 @@ from reviews.models import Title
 
 
 class TitleFilter(rest.FilterSet):
-    name = rest.CharField(
+    name = rest.CharFilter(
         field_name='name',
         lookup_expr=['contains'],
     ),
-    genre = rest.CharField(
+    genre = rest.CharFilter(
         field_name='genre__slug',
         lookup_expr=['contains'],
     ),
-    category = rest.CharField(
+    category = rest.CharFilter(
         field_name='category__slug',
         lookup_expr=['contains'],
     )

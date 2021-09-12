@@ -1,25 +1,29 @@
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from .validators import year_validator
 
-user = get_user_model()
-moderator = get_user_model()
-admin = get_user_model()
 
+class CustomUser(AbstractBaseUser):
 
-class CustomUser(AbstractUser):
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['first_name']
+
+    user = 'user'
+    moderator = 'moderator'
+    admin = 'admin'
+
     CHOICES = (
-        user,
-        moderator,
-        admin,
+        (user, 'Пользователь'),
+        (moderator, 'Модератор'),
+        (admin, 'Администратор'),
     )
     username = models.CharField(
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
-        unique=True
+        unique=True,
+        max_length=256
     )
     email = models.EmailField(
         max_length=254,
@@ -30,12 +34,14 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(
         verbose_name='Имя',
         help_text='Введите имя',
-        blank=True
+        blank=True,
+        max_length=256
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
         help_text='Введите фамилию',
-        blank=True
+        blank=True,
+        max_length=256
     )
     bio = models.TextField(
         verbose_name='Биография',
@@ -46,10 +52,14 @@ class CustomUser(AbstractUser):
         verbose_name='Статус пользователя',
         help_text='Введите статус пользователя',
         choices=CHOICES,
-        default=user
+        default=user,
+        max_length=256
     )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    # user_permissions = models.BooleanField(default=False)
+    # groups
+    # is_active
 
     def __str__(self):
         return self.username
