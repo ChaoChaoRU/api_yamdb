@@ -1,13 +1,15 @@
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import PermissionsMixin
+
 from django.db import models
 
 from .validators import year_validator
 
 
-class CustomUser(AbstractBaseUser):
+class CustomerUser(AbstractBaseUser, PermissionsMixin):
 
-    USERNAME_FIELD = ['username']
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name']
 
     user = 'user'
@@ -57,9 +59,9 @@ class CustomUser(AbstractBaseUser):
     )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    # user_permissions = models.BooleanField(default=False)
-    # groups
-    # is_active
+    # user_permissions = models.ManyToManyField(Permission)
+    # groups courses = models.ManyToManyField(Course)
+    is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
@@ -102,7 +104,7 @@ class Review(models.Model):
         verbose_name='Ваш отзыв',
     )
     author = models.ForeignKey(
-        CustomUser,
+        CustomerUser,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор отзыва',
@@ -139,7 +141,7 @@ class Review(models.Model):
 class Comment(models.Model):
     text = models.TextField(verbose_name='Текст комментария')
     author = models.ForeignKey(
-        CustomUser,
+        CustomerUser,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария',

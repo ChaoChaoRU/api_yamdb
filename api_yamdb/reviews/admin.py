@@ -5,14 +5,14 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser
+from .models import CustomerUser
 
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    model = CustomUser
+    model = CustomerUser
     list_display = ['email', 'username', ]
 
     def get_form(self, request, obj=None, **kwargs):
@@ -33,4 +33,4 @@ class CustomUserAdmin(UserAdmin):
         return form
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(CustomerUser, CustomUserAdmin)
