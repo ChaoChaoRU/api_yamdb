@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from rest_framework import filters
+from rest_framework import filters, viewsets, mixins
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Avg
 from rest_framework.pagination import PageNumberPagination
 from reviews.models import Genre, Category, Title
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
@@ -12,9 +13,10 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAdminUser, AllowAny
 
 from .filter import TitleFilter
+from .serializers import GenreSerializer, TitleReadSerializer
+from .serializers import CategorySerializer, TitleWriteSerializer
 from .serializers import GetUsersSerializer, CreateUserSerializer
 from .serializers import GetPatchDeteleUserSerializer
-from .serializers import GenreSerializer, TitleSerializer, CategorySerializer
 from .pagination import CustomPagination
 from reviews.models import CustomUser, Genre, Category, Title
 from reviews.models import Review, Comment
@@ -63,7 +65,7 @@ class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
     serializers_class = GenreSerializer
     permission_classes = (AdminOrReadOnly,)
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -73,28 +75,24 @@ class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializers_class = CategorySerializer
     permission_classes = (AdminOrReadOnly,)
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
 
-
-class GetCreateTitleViewSet(GetCreateViewSet):
+    
+class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializers_class = TitleSerializer
+    pagination_class = CustomPagination
     permission_classes = (AdminOrReadOnly,)
-    pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
 
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH']:
+            return TitleWriteSerializer
+        return TitleReadSerializer
 
-class GetPatchDeleteTitleViewSet(GetPatchDeteleViewSet):
-    queryset = Title.objects.all()
-    serializers_class = TitleSerializer
-    permission_classes = (AdminOrReadOnly,)
-    pagination_class = PageNumberPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = TitleFilter
 
 
 class GetCreateReviewViewSet(GetCreateViewSet):

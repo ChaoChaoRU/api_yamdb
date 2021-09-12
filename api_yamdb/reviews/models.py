@@ -4,6 +4,10 @@ from django.db import models
 
 from .validators import year_validator
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 11b1ac12f7210423c0812e19f110c0702181da88
 
 class CustomUser(AbstractBaseUser):
 
@@ -14,12 +18,26 @@ class CustomUser(AbstractBaseUser):
     moderator = 'moderator'
     admin = 'admin'
 
+<<<<<<< HEAD
     CHOICES = (
         (user, 'Пользователь'),
         (moderator, 'Модератор'),
         (admin, 'Администратор'),
+=======
+class CustomUser(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
+
+    CHOICES = (
+        (USER, 'Пользователь'),
+        (MODERATOR, 'Модератор'),
+        (ADMIN, 'Администратор')
+>>>>>>> 11b1ac12f7210423c0812e19f110c0702181da88
     )
     username = models.CharField(
+        max_length=256,
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
         unique=True,
@@ -32,12 +50,14 @@ class CustomUser(AbstractBaseUser):
         unique=True
     )
     first_name = models.CharField(
+        max_length=256,
         verbose_name='Имя',
         help_text='Введите имя',
         blank=True,
         max_length=256
     )
     last_name = models.CharField(
+        max_length=256,
         verbose_name='Фамилия',
         help_text='Введите фамилию',
         blank=True,
@@ -49,11 +69,16 @@ class CustomUser(AbstractBaseUser):
         blank=True,
     )
     role = models.CharField(
+        max_length=40,
         verbose_name='Статус пользователя',
         help_text='Введите статус пользователя',
         choices=CHOICES,
+<<<<<<< HEAD
         default=user,
         max_length=256
+=======
+        default=USER
+>>>>>>> 11b1ac12f7210423c0812e19f110c0702181da88
     )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
