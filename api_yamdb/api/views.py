@@ -1,57 +1,69 @@
+from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.db.models import AVG
-from rest_framework import viewsets, mixins, filters
+from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models. import Avg
 from rest_framework.pagination import PageNumberPagination
 from reviews.models import Genre, Category, Title
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import DestroyModelMixin
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAdminUser, AllowAny
 
 from .filter import TitleFilter
-from .serializers import GenreSerializer, TitleReadSerializer,
+from .serializers import GenreSerializer, TitleReadSerializer
 from .serializers import CategorySerializer, TitleWriteSerializer
 from .pagination import CustomPagination
 from reviews.models import CustomUser, Genre, Category, Title
 from reviews.models import Review, Comment
 from .permissions import AuthorOrReadOnly, ModeratorOrReadOnly
-from .permissions import SuperUserOrReadOnly
+from .permissions import AdminOrReadOnly, SuperUserOrReadOnly
 
-User = get_user_model()
+user = get_user_model()
+moderator = get_user_model()
+admin = get_user_model()
 
 
-class GetUsersViewSet(ListModelMixin):
+class GetUsersViewSet(ListModelMixin, GenericViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = GetUsersSerializer
     permission_classes = (IsAdminUser,)
     pagination_class = CustomPagination
 
 
-class CreateUserViewSet(CreateModelMixin):
+class CreateUserViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = CreateUserSerializer
-    permission_classes = (IsAdminUser,)
+    permission_classes = (AllowAny,)
 
 
-class GetPatchDeteleUserViewSet(RetrieveModelMixin, UpdateModelMixin,
-                                DestroyModelMixin, GenericViewSet):
+class GetCreateViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
     pass
 
 
-class GetPatchDeteleUserView(LoginRequiredMixin, GetPatchDeteleUserViewSet):
+class GetPatchDeteleViewSet(RetrieveModelMixin, UpdateModelMixin,
+                            DestroyModelMixin, GenericViewSet):
+    pass
+
+
+class GetPatchDeteleUserView(GetPatchDeteleViewSet):
     serializer_class = GetPatchDeteleUserSerializer
     permission_classes = (IsAdminUser,)
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', ]
-    login_url = 'api/v1/auth/token/'
-    redirect_field_name = 'redirect_to'
 
 
-class CustomViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                    mixins.ListModelMixin, viewsets.GenericViewSet):
+class CustomViewSet(CreateModelMixin, DestroyModelMixin,
+                    ListModelMixin, GenericViewSet):
     pass
 
 
 class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
     serializers_class = GenreSerializer
-    pagination_class = PageNumberPagination
+    permission_classes = (AdminOrReadOnly,)
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -60,16 +72,18 @@ class GenreViewSet(CustomViewSet):
 class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializers_class = CategorySerializer
-    pagination_class = PageNumberPagination
+    permission_classes = (AdminOrReadOnly,)
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
 
-
+    
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
-        rating=AVG('reviews__score')).order_by('-id'))
-    pagination_class = PageNumberPagination
+        rating=Avg('reviews__score')).order_by('-id')
+    pagination_class = CustomPagination
+    permission_classes = (AdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
 
@@ -79,7 +93,13 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleReadSerializer
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
+
+class GetCreateReviewViewSet(GetCreateViewSet):
+    queryset = Review.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+
+class GetPatchDeleteReviewViewSet(GetPatchDeteleViewSet):
     queryset = Review.objects.all()
 
     def get_permissions(self):
@@ -91,6 +111,22 @@ class ReviewViewSet(viewsets.ModelViewSet):
             return (IsAdminUser)
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class GetCreateCommentViewSet(GetCreateViewSet):
     queryset = Comment.objects.all()
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAdminUser,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+
+class GetPatchDeleteCommentViewSet(GetPatchDeteleViewSet):
+    queryset = Comment.objects.all()
+
+    def get_permissions(self, request):
+        if self.user.is_superuser is True:
+            return (SuperUserOrReadOnly(),)
+        elif request.user.role is admin:
+            return (AdminOrReadOnly(),)
+        elif request.user.role is moderator:
+            return (ModeratorOrReadOnly(),)
+        elif request.user.role is user:
+            return (AuthorOrReadOnly(),)
+        else:
+            return (IsAuthenticatedOrReadOnly,)
