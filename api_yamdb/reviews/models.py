@@ -6,8 +6,6 @@ from django.db import models
 from .validators import year_validator
 
 
-
-
 class CustomUser(AbstractUser):
     USER = 'user'
     MODERATOR = 'moderator'
