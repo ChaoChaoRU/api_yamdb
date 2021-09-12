@@ -59,8 +59,6 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
     )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    # user_permissions = models.ManyToManyField(Permission)
-    # groups courses = models.ManyToManyField(Course)
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
