@@ -1,33 +1,35 @@
-from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.contrib.auth.models import AbstractUser
+#from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.auth.models import PermissionsMixin
-
 from django.db import models
 
 from .validators import year_validator
 
+#user = get_user_model()
+#moderator = get_user_model()
+#admin = get_user_model()
 
-class CustomerUser(AbstractBaseUser, PermissionsMixin):
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['first_name']
-
-    user = 'user'
-    moderator = 'moderator'
-    admin = 'admin'
-
-    objects = UserManager()
-
-    CHOICES = (
-        (user, 'Пользователь'),
-        (moderator, 'Модератор'),
-        (admin, 'Администратор'),
-    )
+class CustomUser(AbstractUser):
+    class UserRole:
+        USER = 'user'
+        MODERATOR = 'moderator'
+        ADMIN = 'admin'
+        CHOICES = [
+            (USER, 'user'),
+            (MODERATOR, 'moderator'),
+            (ADMIN, 'admin'), 
+        ]
+#    CHOICES = (
+#        user,
+#        moderator,
+#        admin,
+#    )
     username = models.CharField(
-        max_length=256,
+        max_length=254,
         verbose_name='Имя пользователя',
         help_text='Введите имя пользователя',
-        unique=True,
+        unique=True
     )
     email = models.EmailField(
         max_length=254,
@@ -36,16 +38,16 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
         unique=True
     )
     first_name = models.CharField(
-        max_length=256,
+        max_length=254,
         verbose_name='Имя',
         help_text='Введите имя',
-        blank=True,
+        blank=True
     )
     last_name = models.CharField(
-        max_length=256,
+        max_length=254,
         verbose_name='Фамилия',
         help_text='Введите фамилию',
-        blank=True,
+        blank=True
     )
     bio = models.TextField(
         verbose_name='Биография',
@@ -53,41 +55,54 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
         blank=True,
     )
     role = models.CharField(
-        max_length=40,
+        max_length=254,
         verbose_name='Статус пользователя',
         help_text='Введите статус пользователя',
-        choices=CHOICES,
-        default=user,
+        choices=UserRole.CHOICES,
+        default=UserRole.USER,
     )
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+
+    @property
+    def is_admin(self):
+        return self.role == self.UserRole.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.UserRole.MODERATOR
+
+    #is_staff = models.BooleanField(default=False)
+    #is_superuser = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(verbose_name='Название', max_length=256)
     slug = models.SlugField(unique=True)
 
     class Meta:
         ordering = ['-id', ]
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(verbose_name='Название', max_length=256)
     slug = models.SlugField(unique=True, max_length=50)
 
     class Meta:
         ordering = ['-id', ]
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
 
 
 class Title(models.Model):
-    name = models.CharField(db_index=True, max_length=256)
+    name = models.CharField(verbose_name='Название', 
+                            db_index=True, max_length=256)
     year = models.IntegerField(blank=True, validators=[year_validator])
     description = models.TextField
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
@@ -96,6 +111,8 @@ class Title(models.Model):
 
     class Meta:
         ordering = ['-id', ]
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
 
 class Review(models.Model):
@@ -104,7 +121,7 @@ class Review(models.Model):
         verbose_name='Ваш отзыв',
     )
     author = models.ForeignKey(
-        CustomerUser,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор отзыва',
@@ -141,7 +158,7 @@ class Review(models.Model):
 class Comment(models.Model):
     text = models.TextField(verbose_name='Текст комментария')
     author = models.ForeignKey(
-        CustomerUser,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария',
@@ -154,7 +171,6 @@ class Comment(models.Model):
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        db_index=True,
         verbose_name='Дата комментария',
     )
 

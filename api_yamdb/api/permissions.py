@@ -3,9 +3,12 @@ from rest_framework import permissions
 
 class AuthorOrReadOnly(permissions.BasePermission):
 
+    user = 'user'
+
     def has_permission(self, request, view):
+        user = 'user'
         return (request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated)
+                or request.user.role is user)
 
     def has_object_permission(self, request, view, obj):
         return (obj.author == request.user)
@@ -19,8 +22,7 @@ class ModeratorOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return (
-            obj.author == request.user
-            or obj.author != request.user)
+            request.user.is_moderator is True)
 
 
 class AdminOrReadOnly(permissions.BasePermission):
@@ -30,9 +32,10 @@ class AdminOrReadOnly(permissions.BasePermission):
                 or request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
+        ADMIN = 'admin'
         return (
             request.method in permissions.SAFE_METHODS
-            or request.user.is_staff)
+            or request.user.is_admin is ADMIN)
 
 
 class SuperUserOrReadOnly(permissions.BasePermission):
@@ -41,3 +44,10 @@ class SuperUserOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
                 or request.user.is_superuser)
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or (request.user.is_authenticated and (
+                    request.user.is_admin or request.user.is_superuser)))

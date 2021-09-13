@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from rest_framework import filters, viewsets, mixins
+from rest_framework import filters, viewsets
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Avg
+# from django.db.models import Avg
 from rest_framework.pagination import PageNumberPagination
 from reviews.models import Genre, Category, Title
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
@@ -22,6 +22,7 @@ from reviews.models import CustomerUser, Genre, Category, Title
 from reviews.models import Review, Comment
 from .permissions import AuthorOrReadOnly, ModeratorOrReadOnly
 from .permissions import AdminOrReadOnly, SuperUserOrReadOnly
+from .permissions import IsAdminOrReadOnly
 
 user = get_user_model()
 moderator = get_user_model()
@@ -64,7 +65,7 @@ class CustomViewSet(CreateModelMixin, DestroyModelMixin,
 class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly, )
     pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
@@ -74,16 +75,16 @@ class GenreViewSet(CustomViewSet):
 class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (AdminOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly, )
     pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
 
-    
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    pagination_class = CustomPagination
+    pagination_class = PageNumberPagination
     permission_classes = (AdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
@@ -92,7 +93,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.request.method in ['POST', 'PATCH']:
             return TitleWriteSerializer
         return TitleReadSerializer
-
 
 
 class GetCreateReviewViewSet(GetCreateViewSet):
