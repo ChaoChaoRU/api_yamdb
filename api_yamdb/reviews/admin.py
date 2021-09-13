@@ -1,4 +1,4 @@
-from typing import Set
+'''from typing import Set
 
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -31,6 +31,22 @@ class CustomUserAdmin(UserAdmin):
                 form.base_fields[f].disabled = True
 
         return form
+
+
+admin.site.register(CustomerUser, CustomUserAdmin)'''
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
+from .forms import CustomUserChangeForm, CustomUserCreationForm
+from .models import CustomerUser
+
+
+class CustomUserAdmin(UserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = CustomerUser
+    list_display = ['email', 'username', ]
 
 
 admin.site.register(CustomerUser, CustomUserAdmin)

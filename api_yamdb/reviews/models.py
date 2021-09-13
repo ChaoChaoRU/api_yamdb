@@ -1,68 +1,47 @@
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.auth.models import PermissionsMixin
+
 
 from django.db import models
 
 from .validators import year_validator
 
 
-class CustomerUser(AbstractBaseUser, PermissionsMixin):
+class CustomerUser(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['first_name']
+    ROLES = [
+        (USER, 'Пользователь'),
+        (MODERATOR, 'Модератор'),
+        (ADMIN, 'Администратор')
+    ]
 
-    user = 'user'
-    moderator = 'moderator'
-    admin = 'admin'
-
-    CHOICES = (
-        (user, 'Пользователь'),
-        (moderator, 'Модератор'),
-        (admin, 'Администратор'),
-    )
-    username = models.CharField(
-        max_length=256,
-        verbose_name='Имя пользователя',
-        help_text='Введите имя пользователя',
-        unique=True,
-    )
     email = models.EmailField(
-        max_length=254,
-        verbose_name='Адрес электронной почты',
-        help_text='Введите email',
-        unique=True
-    )
-    first_name = models.CharField(
-        max_length=256,
-        verbose_name='Имя',
-        help_text='Введите имя',
-        blank=True,
-    )
-    last_name = models.CharField(
-        max_length=256,
-        verbose_name='Фамилия',
-        help_text='Введите фамилию',
-        blank=True,
-    )
-    bio = models.TextField(
-        verbose_name='Биография',
-        help_text='Напишите кратко о себе',
-        blank=True,
-    )
+        'Адрес электронной почты', unique=True, db_index=True,)
     role = models.CharField(
-        max_length=40,
-        verbose_name='Статус пользователя',
-        help_text='Введите статус пользователя',
-        choices=CHOICES,
-        default=user,
-    )
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+        'Права', max_length=10, choices=ROLES, default=USER)
+    bio = models.TextField('О себе', null=True, blank=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username',)
+
+    class Meta:
+        ordering = ('username',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return self.username
+        return self.email
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
 
 
 class Genre(models.Model):

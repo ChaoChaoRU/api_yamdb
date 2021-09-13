@@ -63,7 +63,7 @@ class CustomViewSet(CreateModelMixin, DestroyModelMixin,
 
 class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
-    serializers_class = GenreSerializer
+    serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnly,)
     pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
@@ -73,7 +73,7 @@ class GenreViewSet(CustomViewSet):
 
 class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
-    serializers_class = CategorySerializer
+    serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnly,)
     pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
