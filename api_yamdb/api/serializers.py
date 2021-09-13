@@ -1,29 +1,30 @@
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth import get_user_model
 
-from reviews.models import CustomerUser, Genre, Title, Category
-
-
-class GetUsersSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomerUser
-        read_only_fields = ('username',)
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomerUser
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+User = get_user_model()
 
 
-class GetPatchDeteleUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomerUser
-        read_only_fields = ('username',)
-        fields = (
-            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+
+'''class GetUsersSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = CustomUser
+#        fields = (
+#            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+#class CreateUserSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = CustomUser
+#        fields = (
+#            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+#class GetPatchDeteleUserSerializer(serializers.ModelSerializer):
+#    class Meta:
+#        model = CustomUser
+#        fields = (
+#            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )'''
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -62,3 +63,64 @@ class TitleWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field='username', read_only=True)
+
+    def validate(self, data):
+        if self.context['request'].method != 'POST':
+            return data
+        user = self.context['request'].user
+        title = self.context['view'].kwargs.get('title_id')
+        if Review.objects.filter(title=title, author=user).exists():
+            raise serializers.ValidationError(
+                'Вы не можете оставлять больше одного отзыва.'
+            )
+        return data
+
+    class Meta:
+        fields = '__all__'
+        model = Review
+        read_only_fields = ('author', 'title')
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+        read_only_fields = ('author', 'review')
+
+
+class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = ('username', 'role', 'email')
+        model = CustomUser
+
+
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = CustomUser
+        read_only_fields = ('role',)
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('username', 'email')
+        model = User
+
+    def validate_username(self, value):
+        if value['username'] == 'me':
+            raise serializers.ValidationError('You can not use this username.')
+        return value
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()

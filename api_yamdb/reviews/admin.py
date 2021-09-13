@@ -1,18 +1,18 @@
-'''from typing import Set
+from typing import Set
 
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomerUser
+from .models import CustomUser
 
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    model = CustomerUser
+    model = CustomUser
     list_display = ['email', 'username', ]
 
     def get_form(self, request, obj=None, **kwargs):
@@ -33,20 +33,4 @@ class CustomUserAdmin(UserAdmin):
         return form
 
 
-admin.site.register(CustomerUser, CustomUserAdmin)'''
-
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-
-from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import CustomerUser
-
-
-class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
-    form = CustomUserChangeForm
-    model = CustomerUser
-    list_display = ['email', 'username', ]
-
-
-admin.site.register(CustomerUser, CustomUserAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
