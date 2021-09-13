@@ -48,7 +48,7 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CustomPagination
+    pagination_class = CustomPagination1
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
 
