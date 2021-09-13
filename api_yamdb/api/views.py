@@ -8,7 +8,7 @@ from rest_framework.viewsets import GenericViewSet
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
 from .filter import TitleFilter
-from .pagination import CustomPagination, CustomPagination1
+from .pagination import CustomPagination
 from .permissions import (IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly,
                           IsAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -28,7 +28,7 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CustomPagination1
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -39,7 +39,7 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CustomPagination1
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -48,7 +48,7 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CustomPagination1
+    pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
 
@@ -84,7 +84,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review__id'))
         return review.comments.all()
 
     def perform_create(self, serializer):
@@ -159,6 +159,6 @@ def get_jwt_token(request):
         user, serializer.validated_data["confirmation_code"]
     ):
         token = AccessToken.for_user(user)
-        return Response({"token": str(token)}, status=status.HTTP_200_OK)
+        return Response({"token": int(token)}, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -76,14 +76,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-    @property
-    def is_admin(self):
-        return self.role == self.ADMIN
-
-    @property
-    def is_moderator(self):
-        return self.role == self.MODERATOR
-
 
 class Genre(models.Model):
     name = models.CharField(verbose_name='Название', max_length=256)
@@ -112,7 +104,7 @@ class Title(models.Model):
     name = models.CharField(verbose_name='Название', 
                             db_index=True, max_length=256)
     year = models.PositiveSmallIntegerField(blank=True, validators=[year_validator])
-    description = models.TextField()
+    description = models.TextField(default='')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
                                  related_name='titles', blank=True, null=True)
     genre = models.ManyToManyField(Genre, related_name='titles', blank=True)
