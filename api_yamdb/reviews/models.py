@@ -52,7 +52,7 @@ class CustomUser(AbstractUser):
     bio = models.TextField(
         verbose_name='Биография',
         help_text='Напишите кратко о себе',
-        blank=True
+        blank=True,
     )
     role = models.CharField(
         max_length=254,
@@ -103,7 +103,7 @@ class Category(models.Model):
 class Title(models.Model):
     name = models.CharField(verbose_name='Название', 
                             db_index=True, max_length=256)
-    year = models.IntegerField(blank=True, validators=[year_validator])
+    year = models.PositiveSmallIntegerField(blank=True, validators=[year_validator])
     description = models.TextField
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
                                  related_name='titles', blank=True, null=True)
@@ -133,7 +133,7 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews_title',
+        related_name='reviews',
         verbose_name='Произведение',
     )
     pub_date = models.DateTimeField(
