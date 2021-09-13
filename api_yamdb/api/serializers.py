@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from reviews.models import CustomerUser, Genre, Title, Category
+from reviews.models import CustomUser, Genre, Title, Category
 
 
 class GetUsersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomerUser
+        model = CustomUser
         read_only_fields = ('username',)
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
@@ -13,14 +13,14 @@ class GetUsersSerializer(serializers.ModelSerializer):
 
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomerUser
+        model = CustomUser
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
 
 
 class GetPatchDeteleUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomerUser
+        model = CustomUser
         read_only_fields = ('username',)
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role', )

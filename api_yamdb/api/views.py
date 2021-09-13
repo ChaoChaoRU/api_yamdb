@@ -18,7 +18,7 @@ from .serializers import CategorySerializer, TitleWriteSerializer
 from .serializers import GetUsersSerializer, CreateUserSerializer
 from .serializers import GetPatchDeteleUserSerializer
 from .pagination import CustomPagination
-from reviews.models import CustomerUser, Genre, Category, Title
+from reviews.models import CustomUser, Genre, Category, Title
 from reviews.models import Review, Comment
 from .permissions import AuthorOrReadOnly, ModeratorOrReadOnly
 from .permissions import AdminOrReadOnly, SuperUserOrReadOnly
@@ -30,7 +30,7 @@ admin = get_user_model()
 
 
 class GetUsersViewSet(ListModelMixin, GenericViewSet):
-    queryset = CustomerUser.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = GetUsersSerializer
     permission_classes = (IsAdminUser,)
     pagination_class = CustomPagination

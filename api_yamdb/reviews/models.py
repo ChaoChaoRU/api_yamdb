@@ -52,7 +52,7 @@ class CustomUser(AbstractUser):
     bio = models.TextField(
         verbose_name='Биография',
         help_text='Напишите кратко о себе',
-        blank=True,
+        blank=True
     )
     role = models.CharField(
         max_length=254,
