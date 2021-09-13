@@ -98,7 +98,7 @@ class UserSerializer(serializers.ModelSerializer):
     role = serializers.CharField(read_only=True)
 
     class Meta:
-        fields = '__all__'
+        fields = ('username', 'role', 'email')
         model = CustomUser
 
 
