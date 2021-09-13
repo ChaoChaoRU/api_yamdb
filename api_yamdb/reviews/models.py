@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import PermissionsMixin
 
@@ -15,6 +15,8 @@ class CustomerUser(AbstractBaseUser, PermissionsMixin):
     user = 'user'
     moderator = 'moderator'
     admin = 'admin'
+
+    objects = UserManager()
 
     CHOICES = (
         (user, 'Пользователь'),
