@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets, permissions, status
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import GenericViewSet
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
@@ -12,8 +12,8 @@ from .pagination import CustomPagination
 from .permissions import (IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly,
                           IsAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer,ReviewSerializer, TitleSerializer, UserSerializer,
-                          UserEditSerializer, RegisterSerializer, TokenSerializer)
+                          GenreSerializer,ReviewSerializer, TitleReadSerializer, UserSerializer,
+                          UserEditSerializer, RegisterSerializer, TokenSerializer, TitleWriteSerializer)
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.core.mail import send_mail
@@ -26,9 +26,9 @@ User = get_user_model()
 class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, 
                    mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Genre.objects.all()
-    serializers_class = GenreSerializer
+    serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -37,9 +37,9 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, 
                       mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Category.objects.all()
-    serializers_class = CategorySerializer
+    serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -48,17 +48,30 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH']:
+            return TitleWriteSerializer
+        return TitleReadSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
+    def get_title(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(
+            Title.objects.prefetch_related('reviews'),
+            id=title_id
+        )
+        return title
+
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = self.get_title()
         return title.reviews.all()
 
     def perform_create(self, serializer):
