@@ -8,7 +8,7 @@ from rest_framework.viewsets import GenericViewSet
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
 from .filter import TitleFilter
-from .pagination import CustomPagination
+from .pagination import CustomPagination, CustomPagination1
 from .permissions import (IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly,
                           IsAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -28,7 +28,7 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CustomPagination
+    pagination_class = CustomPagination1
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -39,7 +39,7 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CustomPagination
+    pagination_class = CustomPagination1
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
