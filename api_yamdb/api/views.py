@@ -101,6 +101,8 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     lookup_field = 'username'
     permission_classes = (IsAdmin,)
+    # filter_backends = (filters.SearchFilter)
+    # search_fields = ('username', )
 
     @action(
         methods=['get', 'patch', ],
@@ -132,7 +134,7 @@ def register(request):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user = get_object_or_404(
-        User,
+        CustomUser,
         username=serializer.validated_data["username"]
     )
     confirmation_code = default_token_generator.make_token(user)
@@ -152,7 +154,7 @@ def get_jwt_token(request):
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
-        User,
+        CustomUser,
         username=serializer.validated_data["username"]
     )
 
