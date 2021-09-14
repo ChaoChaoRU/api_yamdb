@@ -70,9 +70,6 @@ class CustomUser(AbstractUser):
     def is_moderator(self):
         return self.role == self.UserRole.MODERATOR
 
-    #is_staff = models.BooleanField(default=False)
-    #is_superuser = models.BooleanField(default=False)
-
     def __str__(self):
         return self.email
 
@@ -126,7 +123,7 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Автор отзыва',
     )
-    rating = models.PositiveSmallIntegerField(
+    score = models.PositiveSmallIntegerField(
         validators=(MinValueValidator(1), MaxValueValidator(10)),
         verbose_name='Ваша оценка',
     )

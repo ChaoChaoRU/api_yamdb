@@ -77,9 +77,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = self.get_title()
         return title.reviews.all()
 
+    @action(
+        methods=['post', ],
+        detail=False,
+        permission_classes=[permissions.IsAuthenticated],
+    )
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -87,7 +93,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review__id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         return review.comments.all()
 
     def perform_create(self, serializer):
@@ -95,6 +101,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'),
                                    title_id=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, review=review)
+
+
+#class CommentDetailViewSet(viewsets.ModelViewSet):
+#    pass
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -134,8 +144,35 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     queryset = CustomUser.objects.all()
-    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
+    permission_classes = (IsAdmin,)
     serializer = UserMeSerializer
+
+    def retrieve(self, request, pk=None):
+        queryset = CustomUser.objects.all()
+        UserMe = get_object_or_404(queryset, username=request.user.username)
+        serializer = UserMeSerializer(UserMe)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+#    @action(
+#        methods=['patch', ],
+#        detail=False,
+#        permission_classes=[permissions.IsAuthenticated],
+#        serializer_class=UserMeSerializer,
+#    )
+#    def update(self, request):
+#        queryset = CustomUser.objects.all()
+#        UserMe = get_object_or_404(queryset, username=request.user.username)
+#        if request.user.is_authenticated:
+#            serializer = UserMeSerializer(
+#                UserMe,
+#                data=request.data,
+#                partial=True
+#            )
+#            serializer.is_valid(raise_exception=True)
+#            serializer.save()
+#            return Response(serializer.data, status=status.HTTP_200_OK)
+#        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(["POST"])
