@@ -6,6 +6,7 @@ from rest_framework import filters, mixins, viewsets, permissions, status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.exceptions import PermissionDenied
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 
 from .filter import TitleFilter
 from .pagination import CustomPagination
@@ -14,7 +15,7 @@ from .permissions import (IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly,
 from .serializers import CategorySerializer, CommentSerializer
 from .serializers import GenreSerializer, ReviewSerializer, TitleReadSerializer
 from .serializers import UserSerializer, UserEditSerializer, RegisterSerializer
-from .serializers import TokenSerializer, TitleWriteSerializer
+from .serializers import TokenSerializer, TitleWriteSerializer, UserMeSerializer
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.core.mail import send_mail
@@ -103,6 +104,10 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     # filter_backends = (filters.SearchFilter)
     # search_fields = ('username', )
+    #def get_serializer_class(self):
+    #    if self.request.method in ['POST', 'PATCH']:
+    #        return TitleWriteSerializer
+    #    return TitleReadSerializer
 
     @action(
         methods=['get', 'patch', ],
@@ -125,6 +130,12 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    queryset = CustomUser.objects.all()
+    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
+    serializer = UserMeSerializer
 
 
 @api_view(["POST"])

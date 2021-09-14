@@ -97,16 +97,32 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(read_only=True)
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        )
+        
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        )
 
     class Meta:
-        fields = ('username', 'role', 'email')
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
         model = CustomUser
 
 
 class UserEditSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
+        model = CustomUser
+        read_only_fields = ('role',)
+
+
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
         model = CustomUser
         read_only_fields = ('role',)
 
@@ -121,6 +137,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         required=True,
         validators=[UniqueValidator(queryset=CustomUser.objects.all())]
         )
+    # first_name = serializers.CharField(
+    #)
 
     class Meta:
         fields = ('username', 'email')
