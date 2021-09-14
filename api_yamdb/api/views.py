@@ -4,16 +4,17 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets, permissions, status
 from rest_framework.viewsets import GenericViewSet
-
+from rest_framework.exceptions import PermissionDenied
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
 from .filter import TitleFilter
 from .pagination import CustomPagination, CustomPagination1
 from .permissions import (IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly,
                           IsAdmin)
-from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer,ReviewSerializer, TitleReadSerializer, UserSerializer,
-                          UserEditSerializer, RegisterSerializer, TokenSerializer, TitleWriteSerializer)
+from .serializers import CategorySerializer, CommentSerializer
+from .serializers import GenreSerializer, ReviewSerializer, TitleReadSerializer
+from .serializers import UserSerializer, UserEditSerializer, RegisterSerializer
+from .serializers import TokenSerializer, TitleWriteSerializer
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.core.mail import send_mail
@@ -23,7 +24,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 User = get_user_model()
 
 
-class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, 
+class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                    mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -50,6 +51,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CustomPagination1
     filter_backends = [DjangoFilterBackend]
+    filterset_fields = ('genre') 
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
@@ -101,14 +103,15 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
 
     @action(
-        methods=['get', 'patch',],
+        methods=['get', 'patch', ],
         detail=False,
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=UserEditSerializer,
     )
-
     def own_profile(self, request):
         user = request.user
+        if request.user['username'] == "me":
+            raise PermissionDenied('Использование me для имени запрещено')
         if request.method == "GET":
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -156,9 +159,9 @@ def get_jwt_token(request):
     )
 
     if default_token_generator.check_token(
-        user, serializer.validated_data["confirmation_code"]
+        user, serializer.validated_data["0"]
     ):
         token = AccessToken.for_user(user)
-        return Response({"token": str(token)}, status=status.HTTP_200_OK)
+        return Response({"token": token}, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

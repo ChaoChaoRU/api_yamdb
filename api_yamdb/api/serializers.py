@@ -115,10 +115,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('username', 'email')
         model = User
 
-    def validate_username(self, value):
-        if value['username'] == 'me':
-            raise serializers.ValidationError('You can not use this username.')
-        return value
+    #def validate_username(self, value):
+        #if value['username'] == 'me':
+            #raise serializers.ValidationError('You can not use this username.')
+        #return value
 
 
 class TokenSerializer(serializers.Serializer):
