@@ -74,7 +74,7 @@ class CustomUser(AbstractUser):
     #is_superuser = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.username
+        return self.email
 
 
 class Genre(models.Model):
