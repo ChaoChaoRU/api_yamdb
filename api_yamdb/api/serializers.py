@@ -1,6 +1,8 @@
+from django.db.models.fields import EmailField
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import get_user_model
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
@@ -110,12 +112,24 @@ class UserEditSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+        )
+        
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+        )
 
     class Meta:
         fields = ('username', 'email')
         model = User
+        validators = [UniqueTogetherValidator(
+            queryset=User.objects.all(),
+            fields=['username', 'email']
+        )
+        ]
 
     def validate_username(self, username):
         if username == 'me':

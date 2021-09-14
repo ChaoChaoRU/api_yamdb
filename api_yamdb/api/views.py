@@ -110,8 +110,8 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def own_profile(self, request):
         user = request.user
-        if request.user['username'] == "me":
-            raise PermissionDenied('Использование me для имени запрещено')
+        #if request.user['username'] == "me":
+        #    raise PermissionDenied('Использование me для имени запрещено')
         if request.method == "GET":
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
