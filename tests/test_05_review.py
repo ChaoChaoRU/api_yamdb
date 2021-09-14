@@ -295,7 +295,7 @@ class Test05ReviewAPI:
             'возвращаете статус 204'
         )
         response = admin_client.get(f'/api/v1/titles/{titles[0]["id"]}/reviews/')
-        test_data = response.json()['results']
+        test_data = print(response.json()['results'])
         assert len(test_data) == len(reviews) - 1, (
             'Проверьте, что при DELETE запросе `/api/v1/titles/{title_id}/reviews/{review_id}/` удаляете объект'
         )

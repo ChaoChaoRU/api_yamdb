@@ -14,7 +14,7 @@ from .permissions import (IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly,
 from .serializers import CategorySerializer, CommentSerializer
 from .serializers import GenreSerializer, ReviewSerializer, TitleReadSerializer
 from .serializers import UserSerializer, UserEditSerializer, RegisterSerializer
-from .serializers import TokenSerializer, TitleWriteSerializer
+from .serializers import TokenSerializer, TitleWriteSerializer, ForUserSerializer
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.core.mail import send_mail
@@ -103,18 +103,15 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
 
     @action(
-        methods=['get', 'patch', ],
+        methods=['GET', 'PATCH', ],
         detail=False,
         permission_classes=[permissions.IsAuthenticated],
-        serializer_class=UserEditSerializer,
+#        serializer_class=UserEditSerializer,
     )
-    def own_profile(self, request):
+    def own_profile(self, request, pk=None):
         user = request.user
-        if request.method == "GET":
-            serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == "PATCH":
-            serializer = self.get_serializer(
+            serializer = ForUserSerializer(
                 user,
                 data=request.data,
                 partial=True
@@ -122,7 +119,8 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        serializer = ForUserSerializer(self.request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])

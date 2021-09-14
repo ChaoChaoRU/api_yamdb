@@ -1,4 +1,4 @@
-from django.db.models.fields import EmailField
+
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
@@ -12,11 +12,11 @@ User = get_user_model()
 
 
 
-'''class GetUsersSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = CustomUser
-#        fields = (
-#            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+'''class ForUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
 #class CreateUserSerializer(serializers.ModelSerializer):
 #    class Meta:
 #        model = CustomUser
@@ -97,10 +97,20 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(read_only=True)
+    username = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ],
+        required=True,
+    )
+    email = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]) 
 
     class Meta:
-        fields = ('username', 'role', 'email')
+        fields = ('username', 'role', 'email', 'first_name',
+                  'last_name', 'bio')
         model = CustomUser
 
 
