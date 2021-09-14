@@ -1,11 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets, permissions, status
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.exceptions import PermissionDenied
-from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
+from reviews.models import Category, CustomUser, Genre, Review, Title
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 
 from .filter import TitleFilter
@@ -15,7 +13,8 @@ from .permissions import (IsAdminOrReadOnly, IsAdminModeratorOwnerOrReadOnly,
 from .serializers import CategorySerializer, CommentSerializer
 from .serializers import GenreSerializer, ReviewSerializer, TitleReadSerializer
 from .serializers import UserSerializer, UserEditSerializer, RegisterSerializer
-from .serializers import TokenSerializer, TitleWriteSerializer, UserMeSerializer
+from .serializers import TokenSerializer, TitleWriteSerializer
+from .serializers import UserMeSerializer
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.core.mail import send_mail
@@ -36,7 +35,7 @@ class GenreViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     lookup_field = 'slug'
 
 
-class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, 
+class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                       mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -52,7 +51,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ('genre') 
+    filterset_fields = ('genre')
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
@@ -103,21 +102,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
-#class CommentDetailViewSet(viewsets.ModelViewSet):
-#    pass
-
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
     permission_classes = (IsAdmin,)
-    # filter_backends = (filters.SearchFilter)
-    # search_fields = ('username', )
-    #def get_serializer_class(self):
-    #    if self.request.method in ['POST', 'PATCH']:
-    #        return TitleWriteSerializer
-    #    return TitleReadSerializer
 
     @action(
         methods=['get', 'patch', ],
@@ -147,32 +136,25 @@ class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     permission_classes = (IsAdmin,)
     serializer = UserMeSerializer
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request):
         queryset = CustomUser.objects.all()
         UserMe = get_object_or_404(queryset, username=request.user.username)
         serializer = UserMeSerializer(UserMe)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-#    @action(
-#        methods=['patch', ],
-#        detail=False,
-#        permission_classes=[permissions.IsAuthenticated],
-#        serializer_class=UserMeSerializer,
-#    )
-#    def update(self, request):
-#        queryset = CustomUser.objects.all()
-#        UserMe = get_object_or_404(queryset, username=request.user.username)
-#        if request.user.is_authenticated:
-#            serializer = UserMeSerializer(
-#                UserMe,
-#                data=request.data,
-#                partial=True
-#            )
-#            serializer.is_valid(raise_exception=True)
-#            serializer.save()
-#            return Response(serializer.data, status=status.HTTP_200_OK)
-#        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def update(self, request):
+        queryset = CustomUser.objects.all()
+        UserMe = get_object_or_404(queryset, username=request.user.username)
+        if request.user.is_authenticated:
+            serializer = UserMeSerializer(
+                UserMe,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])
