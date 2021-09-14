@@ -98,19 +98,17 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ],
         required=True,
-    )
-    email = serializers.CharField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]) 
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        )
+        
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        )
 
     class Meta:
-        fields = ('username', 'role', 'email', 'first_name',
-                  'last_name', 'bio')
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
         model = CustomUser
 
 
@@ -121,16 +119,26 @@ class UserEditSerializer(serializers.ModelSerializer):
         read_only_fields = ('role',)
 
 
+class UserMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
+        model = CustomUser
+        read_only_fields = ('role',)
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
         )
         
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
         )
+    # first_name = serializers.CharField(
+    #)
 
     class Meta:
         fields = ('username', 'email')
