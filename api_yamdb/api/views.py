@@ -159,7 +159,7 @@ def get_jwt_token(request):
     )
 
     if default_token_generator.check_token(
-        user, serializer.validated_data["0"]
+        user, serializer.validated_data["confirmation_code"]
     ):
         token = AccessToken.for_user(user)
         return Response({"token": int(token)}, status=status.HTTP_200_OK)
