@@ -124,9 +124,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('username', 'email')
-        model = User
+        model = CustomUser
         validators = [UniqueTogetherValidator(
-            queryset=User.objects.all(),
+            queryset=CustomUser.objects.all(),
             fields=['username', 'email']
         )
         ]
