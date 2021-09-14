@@ -110,15 +110,17 @@ class UserEditSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
     class Meta:
         fields = ('username', 'email')
         model = User
 
-    #def validate_username(self, value):
-        #if value['username'] == 'me':
-            #raise serializers.ValidationError('You can not use this username.')
-        #return value
+    def validate_username(self, username):
+        if username == 'me':
+            raise serializers.ValidationError('You can not use this username.')
+        return username
 
 
 class TokenSerializer(serializers.Serializer):
