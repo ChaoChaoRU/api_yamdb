@@ -1,9 +1,5 @@
 from django.core.management.base import BaseCommand
-from django.db.models import loading
-# from django.db.models import get_app, get_models
-# from django.apps import apps as django_apps
-# from django.apps import apps
-# from apps import loading, get_model
+from django.apps import AppConfig
 
 import csv
 
@@ -20,7 +16,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         file_path = options['path']
-        _model = loading.get_model(options['app_name'], options['model_name'])
+        _model = AppConfig.get_model(
+            options['app_name'], options['model_name'])
         with open(file_path, 'rb') as csv_file:
             reader = csv.reader(csv_file, delimiter=',', quotechar='|')
             header = reader.next()
