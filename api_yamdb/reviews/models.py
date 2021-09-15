@@ -109,6 +109,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def is_moderator(self):
         return self.role == self.UserRole.MODERATOR
 
+    class Meta:
+        ordering = ['-id', ]
+
     def __str__(self):
         return self.email
 
@@ -179,6 +182,7 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ['-id', ]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = [
@@ -212,6 +216,7 @@ class Comment(models.Model):
     )
 
     class Meta:
+        ordering = ['-id', ]
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 
