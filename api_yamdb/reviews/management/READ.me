@@ -1,4 +1,5 @@
-Для запуска примера исполльзования management команды
+1 способ.
+Для запуска примера использования management команды
 
 Наберите в консоли.
 python manage.py what_time_is_it
@@ -11,7 +12,8 @@ python manage.py my_custom_command --path static/data/users.csv --model_name Cus
 
 
 
-
+2 способ.
+https://django-csv-importer.readthedocs.io/en/latest/
 Для загрузки с помощью django адаптера перейдите в режим интерактивной консоли:
 python manage.py shell
 
@@ -35,3 +37,45 @@ df.head()
 2  102         faust         faust@yamdb.fake       user  NaN         NaN        NaN
 3  103      reviewer      reviewer@yamdb.fake       user  NaN         NaN        NaN
 4  104         angry         angry@yamdb.fake  moderator  NaN         NaN        NaN
+
+
+Справка по использованию.
+https://pythonim.ru/libraries/biblioteka-pandas-python
+
+
+
+3 способ.
+Загрузка с помощью django-import-export
+https://django-import-export.readthedocs.io/en/latest/getting_started.html#importing-data
+
+pip install django-import-export
+
+# settings.py
+INSTALLED_APPS = (
+    ...
+    'import_export',
+)
+
+cd api_yamdb
+
+python manage.py collectstatic
+
+Для загрузки с помощью django адаптера перейдите в режим интерактивной консоли:
+python manage.py shell
+
+Загрузите модуль:
+import tablib
+from import_export import resources
+from reviews.models import CustomUser
+book_resource = resources.modelresource_factory(model=CustomUser)()
+dataset = tablib.Dataset(['', 'New book'], headers=['id', 'username', ])
+result = book_resource.import_data(dataset, dry_run=True)
+print(result.has_errors())
+>>>> False
+result = book_resource.import_data(dataset, dry_run=False)
+
+
+
+Также в файл reviews.admin.py включена модель ImportExportActionModelAdmin
+Достаточно зайти на страничку администратора и импорт экспорт csv файлов будет вам доступен.
+

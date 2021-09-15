@@ -6,10 +6,19 @@ from django.contrib.auth.admin import UserAdmin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
+from import_export import resources
+from import_export.admin import ImportExportActionModelAdmin
+
+
+class UserResource(resources.ModelResource):
+
+    class Meta:
+        model = CustomUser
 
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(ImportExportActionModelAdmin, UserAdmin):
+    resource_class = UserResource
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
