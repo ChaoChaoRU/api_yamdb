@@ -24,7 +24,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CategoryField(serializers.SlugRelatedField):
-
     def to_representation(self, value):
         return CategorySerializer(value).data
 
@@ -44,7 +43,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TitleWriteSerializer(serializers.ModelSerializer):
+class TitleWriteSerializer(TitleReadSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all(),
@@ -54,10 +53,6 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all(),
     )
-
-    class Meta:
-        model = Title
-        fields = '__all__'
 
 
 class ReviewSerializer(serializers.ModelSerializer):

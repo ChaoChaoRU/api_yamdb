@@ -118,7 +118,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Genre(models.Model):
     name = models.CharField(verbose_name='Название', max_length=256)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=50)
 
     class Meta:
         ordering = ['-id', ]
@@ -147,7 +147,7 @@ class Title(models.Model):
     description = models.TextField(default='')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
                                  related_name='titles', blank=True, null=True)
-    genre = models.ManyToManyField(Genre, related_name='titles', blank=True)
+    genre = models.ManyToManyField(Genre, db_index=True, blank=True)
 
     class Meta:
         ordering = ['-id', ]
