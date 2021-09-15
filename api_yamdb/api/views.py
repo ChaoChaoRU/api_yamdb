@@ -22,7 +22,6 @@ from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework_simplejwt.tokens import AccessToken
 
-
 User = get_user_model()
 
 
@@ -49,7 +48,8 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).order_by('-id')
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
@@ -88,7 +88,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review__id'))
+        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         return review.comments.all()
 
     def perform_create(self, serializer):
@@ -103,9 +103,15 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     lookup_field = 'username'
     permission_classes = (IsAdmin,)
+    # filter_backends = (filters.SearchFilter)
+    # search_fields = ('username', )
+    #def get_serializer_class(self):
+    #    if self.request.method in ['POST', 'PATCH']:
+    #        return TitleWriteSerializer
+    #    return TitleReadSerializer
 
     @action(
-        methods=['GET', 'PATCH', ],
+        methods=['get', 'patch', ],
         detail=False,
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=UserEditSerializer,
@@ -127,6 +133,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
+class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    queryset = CustomUser.objects.all()
+    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
+    serializer = UserMeSerializer
+
+
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def register(request):
@@ -134,7 +146,7 @@ def register(request):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user = get_object_or_404(
-        User,
+        CustomUser,
         username=serializer.validated_data["username"]
     )
     confirmation_code = default_token_generator.make_token(user)
@@ -154,7 +166,7 @@ def get_jwt_token(request):
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
-        User,
+        CustomUser,
         username=serializer.validated_data["username"]
     )
 

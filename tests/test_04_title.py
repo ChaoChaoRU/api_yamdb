@@ -116,6 +116,7 @@ class Test04TitleAPI:
                 'category': categories[1]['slug'], 'description': 'Крутое пике'}
         admin_client.post('/api/v1/titles/', data=data)
         response = admin_client.get(f'/api/v1/titles/?genre={genres[1]["slug"]}')
+        print(response.json())
         data = response.json()
         assert len(data['results']) == 2, (
             'Проверьте, что при GET запросе `/api/v1/titles/` фильтуется по `genre` параметру `slug` жанра'
