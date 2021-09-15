@@ -18,7 +18,6 @@ from .serializers import CategorySerializer, CommentSerializer
 from .serializers import GenreSerializer, ReviewSerializer, TitleReadSerializer
 from .serializers import UserSerializer, UserEditSerializer, RegisterSerializer
 from .serializers import TokenSerializer, TitleWriteSerializer
-from .serializers import CategoryField, GenreField
 
 
 User = get_user_model()
