@@ -18,6 +18,7 @@ from .serializers import CategorySerializer, CommentSerializer
 from .serializers import GenreSerializer, ReviewSerializer, TitleReadSerializer
 from .serializers import UserSerializer, UserEditSerializer, RegisterSerializer
 from .serializers import TokenSerializer, TitleWriteSerializer
+from .serializers import CategoryField, GenreField
 
 
 User = get_user_model()
@@ -52,7 +53,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ('genre')
     filterset_class = TitleFilter
 
     def get_serializer_class(self):

@@ -3,6 +3,7 @@ from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
 from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import get_user_model
+from .serializers import SlugRelatedField
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
@@ -20,6 +21,17 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         exclude = ('id', )
+
+
+class CategoryField(serializers.SlugRelatedField):
+
+    def to_representation(self, value):
+        return CategorySerializer(value).data
+
+
+class GenreField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        return GenreSerializer(value).data
 
 
 class TitleReadSerializer(serializers.ModelSerializer):
