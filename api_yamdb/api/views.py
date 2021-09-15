@@ -117,7 +117,7 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=UserEditSerializer,
     )
-    def own_profile(self, request):
+    def me(self, request):
         user = request.user
         if request.method == "GET":
             serializer = self.get_serializer(user)
