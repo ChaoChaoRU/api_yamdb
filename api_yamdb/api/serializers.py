@@ -1,4 +1,3 @@
-from django.db.models.fields import EmailField
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
@@ -9,24 +8,6 @@ from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
 
 User = get_user_model()
-
-
-
-'''class GetUsersSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = CustomUser
-#        fields = (
-#            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
-#class CreateUserSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = CustomUser
-#        fields = (
-#            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )
-#class GetPatchDeteleUserSerializer(serializers.ModelSerializer):
-#    class Meta:
-#        model = CustomUser
-#        fields = (
-#            'username', 'email', 'first_name', 'last_name', 'bio', 'role', )'''
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -99,12 +80,10 @@ class CommentSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         required=True,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
-        )
-        
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())])
+
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
-        )
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())])
 
     class Meta:
         fields = (
@@ -130,15 +109,11 @@ class UserMeSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         required=True,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
-        )
-        
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())])
+
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
-        )
-    # first_name = serializers.CharField(
-    #)
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())])
 
     class Meta:
         fields = ('username', 'email')
