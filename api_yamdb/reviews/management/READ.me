@@ -8,3 +8,30 @@ python manage.py my_custom_command -h
 
 Для загрузки файлов .csv введите:
 python manage.py my_custom_command --path static/data/users.csv --model_name CustomUser --app_name reviews
+
+
+
+
+Для загрузки с помощью django адаптера перейдите в режим интерактивной консоли:
+python manage.py shell
+
+Загрузите модуль:
+from reviews.management.commands.my_second_custom_command import MyCsvModel
+
+Введите импорт pandas для того чтобы распарсить csv файл
+pip install pandas
+import pandas as pd
+
+Введите загрузку csv файла:
+df = pd.read_csv("static/data/users.csv")
+df.head()
+
+
+Получаете результат:
+>>> df.head()
+    id      username                    email       role  bio  first_name  last_name
+0  100    bingobongo    bingobongo@yamdb.fake       user  NaN         NaN        NaN
+1  101  capt_obvious  capt_obvious@yamdb.fake      admin  NaN         NaN        NaN
+2  102         faust         faust@yamdb.fake       user  NaN         NaN        NaN
+3  103      reviewer      reviewer@yamdb.fake       user  NaN         NaN        NaN
+4  104         angry         angry@yamdb.fake  moderator  NaN         NaN        NaN

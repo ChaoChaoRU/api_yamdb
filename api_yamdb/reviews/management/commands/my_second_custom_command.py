@@ -4,13 +4,13 @@ from reviews.models import CustomUser
 
 
 class MyCsvModel(CsvModel):
-    id = models.AutoField(match="id")
-    username = models.CharField(match="username")
-    email = models.EmailField(match="email")
-    role = models.CharField(match="role")
-    bio = models.TextField(match="bio")
-    first_name = models.CharField(match="first_name")
-    last_name = models.CharField(match="last_name")
+    id = models.AutoField()
+    username = models.CharField()
+    email = models.EmailField()
+    role = models.CharField()
+    bio = models.TextField()
+    first_name = models.CharField()
+    last_name = models.CharField()
 
     class Meta:
         delimiter = ","
