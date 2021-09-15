@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -47,7 +48,9 @@ class CategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).order_by('-id')
+
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
@@ -137,21 +140,15 @@ class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     serializer = UserMeSerializer
 
     def retrieve(self, request):
-        queryset = CustomUser.objects.all()
-        UserMe = get_object_or_404(queryset, username=request.user.username)
-        serializer = UserMeSerializer(UserMe)
+        serializer = self.serializer_class(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request):
-        queryset = CustomUser.objects.all()
-        UserMe = get_object_or_404(queryset, username=request.user.username)
-        if request.user.is_authenticated:
-            serializer = UserMeSerializer(
-                UserMe,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
+        serializer_data = request.data.get('user', {})
+        serializer = self.serializer_class(
+            request.user, data=serializer_data, partial=True
+        )
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
