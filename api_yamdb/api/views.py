@@ -1,11 +1,14 @@
 from django.db.models import Avg
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
+from django.core.mail import send_mail
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets, permissions, status
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, CustomUser, Genre, Review, Title
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 
 from .filter import TitleFilter
 from .pagination import CustomPagination
@@ -15,12 +18,8 @@ from .serializers import CategorySerializer, CommentSerializer
 from .serializers import GenreSerializer, ReviewSerializer, TitleReadSerializer
 from .serializers import UserSerializer, UserEditSerializer, RegisterSerializer
 from .serializers import TokenSerializer, TitleWriteSerializer
-from .serializers import UserMeSerializer
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
-from django.core.mail import send_mail
-from django.contrib.auth.tokens import default_token_generator
-from rest_framework_simplejwt.tokens import AccessToken
+from .serializers import CategoryField, GenreField
+
 
 User = get_user_model()
 
@@ -130,26 +129,6 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-class UserMeViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
-    queryset = CustomUser.objects.all()
-    permission_classes = (IsAdmin,)
-    serializer = UserMeSerializer
-
-    def retrieve(self, request):
-        serializer = self.serializer_class(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def update(self, request):
-        serializer_data = request.data.get('user', {})
-        serializer = self.serializer_class(
-            request.user, data=serializer_data, partial=True
-        )
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])

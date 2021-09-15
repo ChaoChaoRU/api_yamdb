@@ -3,6 +3,7 @@ from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
 from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import get_user_model
+from .serializers import SlugRelatedField
 
 from reviews.models import Category, Comment, CustomUser, Genre, Review, Title
 
