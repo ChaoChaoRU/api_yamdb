@@ -53,7 +53,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ('genre')
     filterset_class = TitleFilter
 
     def get_serializer_class(self):

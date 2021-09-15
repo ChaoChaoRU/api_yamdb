@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 63d660e449bd43052c9329e51cc62be67eca2b8c
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
@@ -26,6 +22,16 @@ class CategorySerializer(serializers.ModelSerializer):
         exclude = ('id', )
 
 
+class CategoryField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        return CategorySerializer(value).data
+
+
+class GenreField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        return GenreSerializer(value).data
+
+
 class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
@@ -36,7 +42,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TitleWriteSerializer(serializers.ModelSerializer):
+class TitleWriteSerializer(TitleReadSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all(),
@@ -46,10 +52,6 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all(),
     )
-
-    class Meta:
-        model = Title
-        fields = '__all__'
 
 
 class ReviewSerializer(serializers.ModelSerializer):
