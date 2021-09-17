@@ -125,6 +125,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
+            user.role = request.user.role
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -134,6 +135,8 @@ class UserViewSet(viewsets.ModelViewSet):
 @permission_classes([permissions.AllowAny])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
+    CustomUser.objects.get_or_create(
+        email=request.user.email, username=request.user.username)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user = get_object_or_404(
