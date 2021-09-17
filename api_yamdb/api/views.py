@@ -134,9 +134,9 @@ class UserViewSet(viewsets.ModelViewSet):
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def register(request):
-    serializer = RegisterSerializer(data=request.data)
-    CustomUser.objects.get_or_create(
+    user = CustomUser.objects.get_or_create(
         email=request.user.email, username=request.user.username)
+    serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user = get_object_or_404(
