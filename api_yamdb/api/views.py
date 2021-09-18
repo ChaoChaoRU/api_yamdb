@@ -135,7 +135,9 @@ class UserViewSet(viewsets.ModelViewSet):
 def register(request):
     serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    user, create = CustomUser.objects.get_or_create(
+    serializer.save()
+    user = get_object_or_404(
+        CustomUser,
         username=serializer.validated_data['username'],
         email=serializer.validated_data['email']
     )

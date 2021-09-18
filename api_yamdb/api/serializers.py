@@ -136,6 +136,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('You can not use this username.')
         return username
 
+    def create(self, validated_data):
+        user, created = CustomUser.objects.get_or_create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            defaults={
+                'username': validated_data['username'],
+                'email': validated_data['email']})
+        return user
+
 
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField()
